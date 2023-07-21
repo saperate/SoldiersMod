@@ -3,7 +3,7 @@
 	"package": "saperate.soldiersmod.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"SoldiersMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

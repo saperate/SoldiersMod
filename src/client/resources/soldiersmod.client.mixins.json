@@ -3,7 +3,7 @@
 	"package": "saperate.soldiersmod.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"ExampleClientMixin"
+		"SoldiersClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -16,13 +16,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"saperate.soldiersmod.ExampleMod"
+			"saperate.soldiersmod.SoldiersMod"
 		],
 		"client": [
-			"saperate.soldiersmod.ExampleModClient"
+			"saperate.soldiersmod.SoldiersModClient"
 		],
 		"fabric-datagen": [
-			"saperate.soldiersmod.ExampleModDataGenerator"
+			"saperate.soldiersmod.SoldiersModDataGenerator"
 		]
 	},
 	"mixins": [

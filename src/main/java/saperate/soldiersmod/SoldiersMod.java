@@ -1,22 +1,48 @@
 package saperate.soldiersmod;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
+import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnGroup;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.Identifier;
+import saperate.soldiersmod.entity.SoldierBase;
+import saperate.soldiersmod.gui.SoldierBaseScreenHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SoldiersMod implements ModInitializer {
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger("soldiersmod");
+
+	public static final EntityType<SoldierBase> SOLDIERBASE = Registry.register(
+		Registries.ENTITY_TYPE,
+		new Identifier("soldiersmod", "soldier_base"),
+		FabricEntityTypeBuilder.create(SpawnGroup.MISC, SoldierBase::new).dimensions(EntityDimensions.fixed(0.6f, 2f)).build()
+);
+
+public static final Identifier SOLDIER_SCREEN_HANDLER_ID = new Identifier("soldiersmod", "soldier_base");
+
+public static ScreenHandlerType<? extends SoldierBaseScreenHandler> SOLDIER_SCREEN_HANDLER_TYPE;
+
 
 	@Override
 	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
 
 		LOGGER.info("Hello Fabric world!");
+		FabricDefaultAttributeRegistry.register(SOLDIERBASE, SoldierBase.createMobAttributes());
+		SOLDIER_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
+            new Identifier("soldiersmod", "soldierbasescreenhandler"),
+            SoldierBaseScreenHandler::new
+    );
 	}
 }

@@ -32,19 +32,21 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
       this.inventory = inventory;
       inventory.onOpen(playerInventory.player);
 
-      
+ 
+      //TODO ADD FIELD FOR NAME AND ENTITY THINGY
 
       int i;
       int j;
       int v;
+      int b;
       for(v = 0; v < 4; v++){
         this.addSlot(new Slot(inventory, v,15, v * 18 + 1));
       }
 
-      this.addSlot(new Slot(inventory,0 + 1, 70 + v * 18,100 * 18));
-      this.addSlot(new Slot(inventory,1 + 2, 70 + v * 18,100 * 18));
-      v += 2;
-
+      for(b = 0; b < 2; b++){
+         this.addSlot(new Slot(inventory,b + v, 108 + b * 18,19));
+      }
+      v+=b;
       for(i = 0; i < 2; ++i) {
          for(j = 0; j < 4; ++j) {
             this.addSlot(new Slot(inventory, j + i * 4 + v, 90 + j * 18, 37 + i * 18));

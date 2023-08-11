@@ -43,9 +43,6 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
              * inventory.set(0, newItem); // Set the first slot of the soldier's inventory
              * to the new item
              */
-            for (var i = 0; i < inventory.size(); i++) {
-                System.out.print(inventory);
-            }
 
             player.openHandledScreen(createScreenHandlerFactory());
         }

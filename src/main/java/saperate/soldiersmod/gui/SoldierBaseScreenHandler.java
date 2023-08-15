@@ -1,5 +1,6 @@
 package saperate.soldiersmod.gui;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -31,9 +32,10 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
       checkSize(inventory, CONTAINER_SIZE);
       this.inventory = inventory;
       inventory.onOpen(playerInventory.player);
-
  
       //TODO ADD FIELD FOR NAME AND ENTITY THINGY
+      
+      
 
       int i;
       int j;
@@ -44,12 +46,12 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
       }
 
       for(b = 0; b < 2; b++){
-         this.addSlot(new Slot(inventory,b + v, 108 + b * 18,19));
+         this.addSlot(new Slot(inventory,b + v, 108 + b * 18,10));
       }
       v+=b;
       for(i = 0; i < 2; ++i) {
          for(j = 0; j < 4; ++j) {
-            this.addSlot(new Slot(inventory, j + i * 4 + v, 90 + j * 18, 37 + i * 18));
+            this.addSlot(new Slot(inventory, j + i * 4 + v, 90 + j * 18, 28 + i * 18));
          }
       }
 

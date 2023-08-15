@@ -57,36 +57,9 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
         ServerPlayerEntity serverPlayer;
         if(player instanceof ServerPlayerEntity){
             serverPlayer = (ServerPlayerEntity) player;
-        }
-        else{
-            return ActionResult.FAIL;
-        }
-        
-        if (!player.getWorld().isClient) {
-            /*
-             * ItemStack newItem = new ItemStack(Items.DIAMOND, 1); // Replace with the
-             * desired item
-             * inventory.set(0, newItem); // Set the first slot of the soldier's inventory
-             * to the new item
-             */
-
-            /*
-             * PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-             * buf.writeUuid(entityUUID);
-             * int syncId = nextSyncId++;
-             * SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE.create(0, player.getInventory(),
-             * buf);
-             * //use packets to open gui
-             * 
-             * serverPlayer.networkHandler.sendPacket(new OpenScreenS2CPacket(syncId,
-             * SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE, Text.of("Test")));
-             */
-            
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeUuid(entityUUID);
-            buf.writeInt(nextSyncId++); // Increment the syncId
-
-            // Send the packet to the client
+            buf.writeInt(nextSyncId++);
             ServerPlayNetworking.send(serverPlayer, PacketIdentifiers.OPEN_SOLDIER_SCREEN, buf);
         }
         return ActionResult.SUCCESS;

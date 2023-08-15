@@ -28,17 +28,17 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
    private UUID entityUuid;
 
    public SoldierBaseScreenHandler(int syncId, PlayerInventory playerInventory) {
-      this(syncId, playerInventory, new SimpleInventory(9),null);
+      this(syncId, playerInventory, new SimpleInventory(CONTAINER_SIZE),null);
   }
 
   public SoldierBaseScreenHandler(int syncId, PlayerInventory playerInventory, UUID entityUuid) {
-   this(syncId, playerInventory,  new SimpleInventory(9), entityUuid);
+   this(syncId, playerInventory,  new SimpleInventory(CONTAINER_SIZE), entityUuid);
 }
 
 
    public SoldierBaseScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, UUID entityUuid) {
       super(SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE, syncId);
-      System.out.println("SoldierEntity received in screen handler: " + entityUuid);
+      System.out.println("SyncId handler: " + syncId);
       checkSize(inventory, CONTAINER_SIZE);
       this.inventory = inventory;
       inventory.onOpen(playerInventory.player);

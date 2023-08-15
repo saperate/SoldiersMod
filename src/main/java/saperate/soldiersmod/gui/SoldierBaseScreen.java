@@ -25,11 +25,13 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       super(handler,plrInv, Text.of("Hi"));
 
       this.handler = handler;
+      System.out.println("SyncId Screen:" + this.handler.syncId);
     }
 
     public SoldierBaseScreen(SoldierBaseScreenHandler handler, PlayerInventory inventory, Text title) {
       super(handler, inventory, title);
       this.handler = handler;
+
       System.out.println(handler);
       System.out.println("-=-=-=-");
       System.out.println(handler.getEntity());
@@ -48,7 +50,6 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       this.renderBackground(context);
       super.render(context, mouseX, mouseY, delta);
       this.drawMouseoverTooltip(context, mouseX, mouseY);
-      System.out.println("HAllo");
    }
 
    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {

@@ -37,18 +37,13 @@ public class SoldiersModClient implements ClientModInitializer {
 		EntityModelLayerRegistry.registerModelLayer(MODEL_SOLDIER_BASE_LAYER, SoldierBaseModel::getTexturedModelData);
 		HandledScreens.register(SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE, (gui, inventory, title) -> new SoldierBaseScreen(gui, inventory.player.getInventory(), title));
 	ClientPlayNetworking.registerGlobalReceiver(PacketIdentifiers.OPEN_SOLDIER_SCREEN, (client, handler, buf, responseSender) -> {
-            // Read the data from the packet
             UUID entityUUID = buf.readUuid();
             int syncId = buf.readInt();
-
-            // Open the soldier screen on the client
+			System.out.println("SyncId Client Packet Receiver: " + syncId);
+			SoldierBaseScreenHandler screenHandler = new SoldierBaseScreenHandler(syncId,client.player.getInventory());
             MinecraftClient.getInstance().execute(() -> {
-                //Entity entity = client.world.getEntityByUuid(entityUUID);
-                if (true){//entity instanceof SoldierBase) {
-                    // Open the screen for the soldier entity
-					
-                    client.setScreen(new SoldierBaseScreen(null,client.player.getInventory(),buf));
-                }
+                    client.setScreen(new SoldierBaseScreen(screenHandler,client.player.getInventory(),buf));
+                
             });
         });
 	}

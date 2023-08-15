@@ -47,9 +47,9 @@ public class SoldiersMod implements ModInitializer {
 	public static final Identifier SOLDIER_SCREEN_HANDLER_ID = new Identifier("soldiersmod", "soldier_base");
 
 	public static final ExtendedScreenHandlerType<SoldierBaseScreenHandler> SOLDIER_SCREEN_HANDLER_TYPE = new ExtendedScreenHandlerType<>(
-			(syncId, inventory, buf) -> {
-				return new SoldierBaseScreenHandler(syncId, inventory, buf);
-			});
+		(syncId, inventory, buf) -> {
+			return new SoldierBaseScreenHandler(syncId, inventory, buf);
+		});
 
 	@Override
 	public void onInitialize() {

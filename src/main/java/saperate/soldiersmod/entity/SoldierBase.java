@@ -56,11 +56,21 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
         Owner_UUID = player.getUuid();
         ServerPlayerEntity serverPlayer;
         if(player instanceof ServerPlayerEntity){
+             
+             //use packets to open gui
+             
+             
+
             serverPlayer = (ServerPlayerEntity) player;
+            int syncId = nextSyncId++;
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeUuid(entityUUID);
-            buf.writeInt(nextSyncId++);
+            buf.writeInt(syncId);
+
+            SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE.create(syncId, player.getInventory(),buf);
+
             ServerPlayNetworking.send(serverPlayer, PacketIdentifiers.OPEN_SOLDIER_SCREEN, buf);
+            
         }
         return ActionResult.SUCCESS;
     }

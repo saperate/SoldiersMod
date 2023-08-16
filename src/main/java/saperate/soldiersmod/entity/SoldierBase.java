@@ -55,11 +55,9 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         Owner_UUID = player.getUuid();
         ServerPlayerEntity serverPlayer;
-        if(player instanceof ServerPlayerEntity){
-             
-             //use packets to open gui
-             
-             
+        if (player instanceof ServerPlayerEntity) {
+
+            // use packets to open gui
 
             serverPlayer = (ServerPlayerEntity) player;
             int syncId = nextSyncId++;
@@ -67,10 +65,15 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
             buf.writeUuid(entityUUID);
             buf.writeInt(syncId);
 
-            SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE.create(syncId, player.getInventory(),buf);
+            PacketByteBuf buf2 = PacketByteBufs.create();
+            buf2.writeUuid(entityUUID);
+            buf2.writeInt(syncId);
 
+            // Create the packet handler using the player's inventory and syncId
+            SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE.create(syncId, player.getInventory(),buf2);
+            // Send the packet to the serverPlayer
             ServerPlayNetworking.send(serverPlayer, PacketIdentifiers.OPEN_SOLDIER_SCREEN, buf);
-            
+
         }
         return ActionResult.SUCCESS;
     }

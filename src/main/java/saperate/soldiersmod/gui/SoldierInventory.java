@@ -1,5 +1,6 @@
 package saperate.soldiersmod.gui;
 
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
@@ -9,6 +10,7 @@ import net.minecraft.util.collection.DefaultedList;
 public interface SoldierInventory extends Inventory  {
 
     DefaultedList<ItemStack> getItems();
+    
     
     static SoldierInventory of(DefaultedList<ItemStack> items) {
         return () -> items;

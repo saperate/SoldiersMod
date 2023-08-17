@@ -1,20 +1,14 @@
 package saperate.soldiersmod;
 
-import java.util.UUID;
-
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents.Register;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
-import saperate.soldiersmod.SoldiersMod.PacketIdentifiers;
-import saperate.soldiersmod.entity.SoldierBase;
 import saperate.soldiersmod.entity.SoldierBaseModel;
 import saperate.soldiersmod.entity.SoldierBaseRenderer;
 import saperate.soldiersmod.gui.SoldierBaseScreen;
@@ -35,16 +29,6 @@ public class SoldiersModClient implements ClientModInitializer {
 		
 
 		EntityModelLayerRegistry.registerModelLayer(MODEL_SOLDIER_BASE_LAYER, SoldierBaseModel::getTexturedModelData);
-		HandledScreens.register(SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE, (gui, inventory, title) -> new SoldierBaseScreen(gui, inventory.player.getInventory(), title));
-	ClientPlayNetworking.registerGlobalReceiver(PacketIdentifiers.OPEN_SOLDIER_SCREEN, (client, handler, buf, responseSender) -> {
-            UUID entityUUID = buf.readUuid();
-            int syncId = buf.readInt();
-			System.out.println("SyncId Client Packet Receiver: " + syncId);
-			SoldierBaseScreenHandler screenHandler = new SoldierBaseScreenHandler(syncId,client.player.getInventory());
-            MinecraftClient.getInstance().execute(() -> {
-                    client.setScreen(new SoldierBaseScreen(screenHandler,client.player.getInventory(),buf));
-                
-            });
-        });
+		HandledScreens.register(SoldiersMod.SOLDIER_SCREEN_HANDLER_TYPE, SoldierBaseScreen::new);
 	}
 }

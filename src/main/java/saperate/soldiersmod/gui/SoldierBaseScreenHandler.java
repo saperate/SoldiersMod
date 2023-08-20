@@ -1,5 +1,7 @@
 package saperate.soldiersmod.gui;
 
+import java.util.List;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -7,9 +9,16 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.util.crash.CrashException;
+import net.minecraft.util.crash.CrashReport;
+import net.minecraft.util.crash.CrashReportSection;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.World;
 import saperate.soldiersmod.SoldiersMod;
 import saperate.soldiersmod.SoldiersModClient;
 import saperate.soldiersmod.entity.SoldierBase;
@@ -22,6 +31,8 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
    private static final int HOTBAR_END = 45;
    private final Inventory inventory;
    private final PlayerEntity player;
+   private SoldierBase entity = null;
+   private SoldierBaseScreen screen = null;
 
    public SoldierBaseScreenHandler(int syncId, PlayerInventory playerInventory) {
       this(syncId, playerInventory, new SimpleInventory(CONTAINER_SIZE));
@@ -32,6 +43,7 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
       checkSize(inventory, CONTAINER_SIZE);
       this.inventory = inventory;
       this.player = playerInventory.player;
+      findEntity();
 
       inventory.onOpen(player);
       //TODO ADD FIELD FOR NAME AND ENTITY THINGY
@@ -104,6 +116,9 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
          }
 
          slot2.onTakeItem(player, itemStack2);
+         if (slot2.id >= 0 && slot2.id <= 6) {
+            entity.equipItemStack();
+         }
       }
 
       return itemStack;
@@ -112,9 +127,39 @@ public class SoldierBaseScreenHandler  extends ScreenHandler {
    public void onClosed(PlayerEntity player) {
       super.onClosed(player);
       this.inventory.onClose(player);
+
+      entity.setGuiVisible(false);
    }
 
    public PlayerEntity getPlayerEntity(){
       return player;
+   }
+
+
+   public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+      super.onSlotClick(slotIndex,button,actionType,player);
+      if(!player.getWorld().isClient){
+         entity.equipItemStack();
+      }
+      
+   }
+
+   private void findEntity(){
+      //get every SoldierBase in a 10 block radius
+      List<SoldierBase> potentialEntities = player.getWorld().getEntitiesByClass(
+            SoldierBase.class,
+            new Box(player.getX() - 10, player.getY() - 10, player.getZ() - 10,
+                  player.getX() + 10, player.getY() + 10, player.getZ() + 10),
+            entity -> true);
+
+      //iterate through the list to find the one that is opened
+      for (var i = 0; i < potentialEntities.size(); i++) {
+         var curr = potentialEntities.get(i);
+         var IsGUIOpened = curr.getGuiVisible();
+         if (curr.Owner_UUID == player.getUuid() && IsGUIOpened == true) {
+            this.entity = curr;
+            return;
+         }
+      }
    }
 }

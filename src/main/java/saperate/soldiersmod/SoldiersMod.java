@@ -35,11 +35,13 @@ public static final Identifier SOLDIER_SCREEN_HANDLER_ID = new Identifier("soldi
 public static ScreenHandlerType<? extends SoldierBaseScreenHandler> SOLDIER_SCREEN_HANDLER_TYPE;
 
 
+
+
 	@Override
 	public void onInitialize() {
 
 		LOGGER.info("Hello Fabric world!");
-		FabricDefaultAttributeRegistry.register(SOLDIERBASE, SoldierBase.createMobAttributes());
+		FabricDefaultAttributeRegistry.register(SOLDIERBASE, SoldierBase.createHostileAttributes());
 		SOLDIER_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(
             new Identifier("soldiersmod", "soldierbasescreenhandler"),
             SoldierBaseScreenHandler::new

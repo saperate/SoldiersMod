@@ -8,6 +8,7 @@ import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -27,6 +28,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import saperate.soldiersmod.entity.SoldierBase;
+import net.minecraft.network.PacketByteBuf;
 
 public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
    private static final Identifier TEXTURE = new Identifier("soldiersmod", "textures/gui/soldierscreen.png");
@@ -38,14 +40,17 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
    private static final int OFFHAND_SLOT_X = 8;
    private static final int OFFHAND_SLOT_Y = 72;
 
-   private TextFieldWidget nameField;
+   //private TextFieldWidget nameField;
    public PlayerEntity player;
    public SoldierBase entity;
 
    public SoldierBaseScreen(SoldierBaseScreenHandler handler, PlayerInventory inventory, Text title) {
       super(handler, inventory, title);
       player = handler.getPlayerEntity();
+      findEntity();
+   }
 
+   public SoldierBase findEntity(){
       //get every SoldierBase in a 10 block radius
       List<SoldierBase> potentialEntities = player.getWorld().getEntitiesByClass(
             SoldierBase.class,
@@ -57,20 +62,20 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       for (var i = 0; i < potentialEntities.size(); i++) {
          var curr = potentialEntities.get(i);
          var IsGUIOpened = curr.getGuiVisible();
-         if (curr.Owner_UUID == player.getUuid() || IsGUIOpened == true) {
+         if (curr.Owner_UUID == player.getUuid() && IsGUIOpened == true) {
             this.entity = curr;
          }
       }
-      entity.equipStack(EquipmentSlot.CHEST, ItemStack.EMPTY);
 
+      return entity;
    }
 
    protected void init() {
       super.init();
-      nameField = this.addDrawableChild(new TextFieldWidget(this.textRenderer, 1, 1, 100, 10, this.title));
-      nameField.setMaxLength(50);
-      nameField.setFocusUnlocked(true);
-      setInitialFocus(nameField);
+      //nameField = this.addDrawableChild(new TextFieldWidget(this.textRenderer, 1, 1, 100, 10, this.title));
+      //nameField.setMaxLength(50);
+      //nameField.setFocusUnlocked(true);
+      //setInitialFocus(nameField);
    }
 
    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -83,7 +88,7 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       int i = (this.width - this.backgroundWidth) / 2;
       int j = (this.height - 32 - this.backgroundHeight) / 2;
       context.drawTexture(TEXTURE, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight + 32);
-      drawEntity(context, i + 63, j + 83, 30, (float)(i + 63) - mouseX, (float)(j + 83 - 50) - mouseY, this.entity);
+      drawEntity(context, i + 61, j + 83, 30, (float)(i + 61) - mouseX, (float)(j + 83 - 50) - mouseY, this.entity);
    }
 
    @Override
@@ -91,9 +96,9 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       // Left empty cause i dont want a title in my GUI
    }
 
+/* 
    @Override
    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-
       // Override to prvent from closing while typing
       if (nameField.isActive() && keyCode != 256) {
          return true;
@@ -116,15 +121,15 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
          return true;
       }
    }
-
+*/
    public void removed() {
       if (this.client.player != null) {
          this.handler.onClosed(this.client.player);
-         if(this.entity != null){
-            this.entity.setGuiVisible(false);
-         }
       }
    }
+
+   
+
 
    
    public static void drawEntity(DrawContext context, int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {

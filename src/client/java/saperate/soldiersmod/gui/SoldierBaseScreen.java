@@ -8,27 +8,19 @@ import org.joml.Quaternionf;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
+import saperate.soldiersmod.SoldierBaseScreenHandler;
 import saperate.soldiersmod.entity.SoldierBase;
-import net.minecraft.network.PacketByteBuf;
 
 public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
    private static final Identifier TEXTURE = new Identifier("soldiersmod", "textures/gui/soldierscreen.png");
@@ -61,8 +53,7 @@ public class SoldierBaseScreen extends HandledScreen<SoldierBaseScreenHandler> {
       //iterate through the list to find the one that is opened
       for (var i = 0; i < potentialEntities.size(); i++) {
          var curr = potentialEntities.get(i);
-         var IsGUIOpened = curr.getGuiVisible();
-         if (curr.Owner_UUID == player.getUuid() && IsGUIOpened == true) {
+         if (curr.Owner_UUID == player.getUuid() && curr.getGuiVisible()) {
             this.entity = curr;
          }
       }

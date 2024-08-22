@@ -1,6 +1,5 @@
-package saperate.soldiersmod.gui;
+package saperate.soldiersmod.entity;
 
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;

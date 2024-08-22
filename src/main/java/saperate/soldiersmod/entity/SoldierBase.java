@@ -2,11 +2,11 @@ package saperate.soldiersmod.entity;
 
 import java.util.UUID;
 
-import net.minecraft.block.Block;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.ai.goal.AttackGoal;
 import net.minecraft.entity.ai.goal.AvoidSunlightGoal;
 import net.minecraft.entity.ai.goal.EscapeSunlightGoal;
 import net.minecraft.entity.ai.goal.FleeEntityGoal;
@@ -23,21 +23,23 @@ import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.TurtleEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
-import saperate.soldiersmod.gui.SoldierBaseScreenHandler;
-import saperate.soldiersmod.gui.SoldierInventory;
 import net.minecraft.nbt.NbtCompound;
+import org.jetbrains.annotations.Nullable;
+import saperate.soldiersmod.SoldierBaseScreenHandler;
+import saperate.soldiersmod.network.ModMessages;
 
 public class SoldierBase extends PathAwareEntity implements SoldierInventory {
     public UUID Owner_UUID;
@@ -54,11 +56,11 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
     protected void initGoals() {
       this.goalSelector.add(2, new AvoidSunlightGoal(this));
       this.goalSelector.add(3, new EscapeSunlightGoal(this, 1.0));
-      this.goalSelector.add(3, new FleeEntityGoal(this, WolfEntity.class, 6.0F, 1.0, 1.2));
+      this.goalSelector.add(3, new FleeEntityGoal(this, WolfEntity.class, 6.0F, .5f, .5f));
       this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0));
       this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
       this.goalSelector.add(6, new LookAroundGoal(this));
-      this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
+      this.targetSelector.add(1, new RevengeGoal(this));
       this.targetSelector.add(2, new ActiveTargetGoal(this, PlayerEntity.class, true));
       this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
       this.targetSelector.add(3, new ActiveTargetGoal(this, TurtleEntity.class, 10, true, false, TurtleEntity.BABY_TURTLE_ON_LAND_FILTER));
@@ -77,16 +79,23 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
 
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         setGuiVisible(true);
-        Inventory inventory = (Inventory) this;
-        equippedToInv(inventory);
+        equippedToInv(this);
         Owner_UUID = player.getUuid();
         if (!player.getWorld().isClient) {
-            
-            player.openHandledScreen(createScreenHandlerFactory(inventory));
-            var y = this.getEquippedStack(EquipmentSlot.CHEST);
+            NamedScreenHandlerFactory screenHandlerFactory = createScreenHandlerFactory(this);
+            player.openHandledScreen(screenHandlerFactory);
         }
+        System.out.println(speed);
+        speed = 1.0f;
         return ActionResult.SUCCESS;
     }
+
+    public static NamedScreenHandlerFactory createScreenHandlerFactory(Inventory inventory) {
+        return new SimpleNamedScreenHandlerFactory((syncId, playerInventory, playerEntity) -> {
+            return new SoldierBaseScreenHandler(syncId, playerInventory, inventory);
+        }, Text.of("Soldier Inventory"));
+    }
+
 
 
     @Override
@@ -107,11 +116,6 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
         Inventories.readNbt(tag, items);
     }
 
-    public NamedScreenHandlerFactory createScreenHandlerFactory(Inventory inventory) {
-        return new SimpleNamedScreenHandlerFactory((syncId, playerInventory, playerEntity) -> {
-            return new SoldierBaseScreenHandler(syncId, playerInventory, inventory);
-        }, Text.of("Soldier Inventory"));
-    }
 
     public void setGuiVisible(boolean val) {
         IsGUIOpened = val;
@@ -143,4 +147,6 @@ public class SoldierBase extends PathAwareEntity implements SoldierInventory {
         inventory.setStack(5, this.getEquippedStack(EquipmentSlot.OFFHAND).copy());
         return inventory;
     }
+
+
 }

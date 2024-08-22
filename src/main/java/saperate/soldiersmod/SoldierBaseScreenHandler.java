@@ -2,6 +2,10 @@ package saperate.soldiersmod;
 
 import java.util.List;
 
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -10,16 +14,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import saperate.soldiersmod.SoldiersMod;
 import saperate.soldiersmod.entity.SoldierBase;
 
 public class SoldierBaseScreenHandler extends ScreenHandler {
+    public static final Identifier EMPTY_HELMET_SLOT_TEXTURE = new Identifier("item/empty_armor_slot_helmet");
+    public static final Identifier EMPTY_CHESTPLATE_SLOT_TEXTURE = new Identifier("item/empty_armor_slot_chestplate");
+    public static final Identifier EMPTY_LEGGINGS_SLOT_TEXTURE = new Identifier("item/empty_armor_slot_leggings");
+    public static final Identifier EMPTY_BOOTS_SLOT_TEXTURE = new Identifier("item/empty_armor_slot_boots");
+    public static final Identifier EMPTY_OFFHAND_ARMOR_SLOT = new Identifier("item/empty_armor_slot_shield");
+    private final Identifier[] EMPTY_ARMOR_SLOT_TEXTURES = new Identifier[]{EMPTY_BOOTS_SLOT_TEXTURE, EMPTY_LEGGINGS_SLOT_TEXTURE, EMPTY_CHESTPLATE_SLOT_TEXTURE, EMPTY_HELMET_SLOT_TEXTURE};
+    private static final EquipmentSlot[] EQUIPMENT_SLOT_ORDER = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
     private static final int CONTAINER_SIZE = 14;
     private static final int INVENTORY_START = 9;
     private static final int INVENTORY_END = 36;
@@ -28,7 +41,6 @@ public class SoldierBaseScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final PlayerEntity player;
     private SoldierBase entity = null;
-
 
     public SoldierBaseScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, new SimpleInventory(CONTAINER_SIZE));
@@ -44,32 +56,51 @@ public class SoldierBaseScreenHandler extends ScreenHandler {
         inventory.onOpen(player);
         //TODO ADD FIELD FOR NAME AND ENTITY THINGY
 
-        int i;
-        int j;
-        int v;
-        int b;
-        for (v = 0; v < 4; v++) {
-            var slot = this.addSlot(new Slot(inventory, v, 15, v * 18 + 1));
 
+        for(int i = 0; i < 4; ++i) {
+            EquipmentSlot equipmentSlot = EQUIPMENT_SLOT_ORDER[i];
+            this.addSlot(new Slot(inventory, i, 15, 1 + i * 18) {
+                public void setStack(ItemStack stack) {
+                    super.setStack(stack);
+                }
+
+                public int getMaxItemCount() {
+                    return 1;
+                }
+
+                public boolean canInsert(ItemStack stack) {
+                    return equipmentSlot == MobEntity.getPreferredEquipmentSlot(stack);
+                }
+
+                public boolean canTakeItems(PlayerEntity playerEntity) {
+                    ItemStack itemStack = this.getStack();
+                    return (itemStack.isEmpty() || playerEntity.isCreative() || !EnchantmentHelper.hasBindingCurse(itemStack)) && super.canTakeItems(playerEntity);
+                }
+
+                public Pair<Identifier, Identifier> getBackgroundSprite() {
+                    return Pair.of(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, EMPTY_ARMOR_SLOT_TEXTURES[equipmentSlot.getEntitySlotId()]);
+                }
+            });
         }
 
-        for (b = 0; b < 2; b++) {
-            this.addSlot(new Slot(inventory, b + v, 108 + b * 18, 19));
+
+        for (int b = 0; b < 2; b++) {
+            this.addSlot(new Slot(inventory, b + 4, 108 + b * 18, 19));
         }
-        v += b;
-        for (i = 0; i < 2; ++i) {
-            for (j = 0; j < 4; ++j) {
-                this.addSlot(new Slot(inventory, j + i * 4 + v, 90 + j * 18, 37 + i * 18));
+
+        for (int i = 0; i < 2; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                this.addSlot(new Slot(inventory, j + i * 4 + 6, 90 + j * 18, 37 + i * 18));
             }
         }
 
-        for (i = 0; i < 3; ++i) {
-            for (j = 0; j < 9; ++j) {
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 9; ++j) {
                 this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
-        for (i = 0; i < 9; ++i) {
+        for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
 
@@ -89,37 +120,10 @@ public class SoldierBaseScreenHandler extends ScreenHandler {
     }
 
     public ItemStack quickMove(PlayerEntity player, int slot) {
-        ItemStack itemStack = ItemStack.EMPTY;
-        Slot slot2 = (Slot) this.slots.get(slot);
-        if (slot2 != null && slot2.hasStack()) {
-            ItemStack itemStack2 = slot2.getStack();
-            itemStack = itemStack2.copy();
-            if (slot < 9) {
-                if (!this.insertItem(itemStack2, 9, 45, true)) {
-                    return ItemStack.EMPTY;
-                }
-            } else if (!this.insertItem(itemStack2, 0, 9, false)) {
-                return ItemStack.EMPTY;
-            }
-
-            if (itemStack2.isEmpty()) {
-                slot2.setStack(ItemStack.EMPTY);
-            } else {
-                slot2.markDirty();
-            }
-
-            if (itemStack2.getCount() == itemStack.getCount()) {
-                return ItemStack.EMPTY;
-            }
-
-            slot2.onTakeItem(player, itemStack2);
-            if (slot2.id >= 0 && slot2.id <= 6) {
-                entity.equipItemStack();
-            }
-        }
-
-        return itemStack;
+        return ItemStack.EMPTY;
     }
+
+
 
     public void onClosed(PlayerEntity player) {
         super.onClosed(player);

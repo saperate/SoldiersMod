@@ -39,7 +39,6 @@ import net.minecraft.world.World;
 import net.minecraft.nbt.NbtCompound;
 import org.jetbrains.annotations.Nullable;
 import saperate.soldiersmod.SoldierBaseScreenHandler;
-import saperate.soldiersmod.network.ModMessages;
 
 public class SoldierBase extends PathAwareEntity implements SoldierInventory {
     public UUID Owner_UUID;
